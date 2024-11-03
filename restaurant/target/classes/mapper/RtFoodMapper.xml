@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.restaurant.mapper.RtFoodMapper">
+
+    <resultMap type="com.example.restaurant.domain.RtFood" id="RtFoodResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="price"    column="price"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="url"    column="url"    />
+    </resultMap>
+
+    <sql id="selectRtFoodVo">
+        select id, name, price, del_flag, create_time, create_by, update_time, update_by,url from rt_food
+    </sql>
+
+    <select id="selectRtFoodList" parameterType="com.example.restaurant.domain.RtFood" resultMap="RtFoodResult">
+        <include refid="selectRtFoodVo"/>
+        <where>del_flag='0'
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="price != null "> and price = #{price}</if>
+        </where>
+    </select>
+
+    <select id="selectRtFoodById" parameterType="long" resultMap="RtFoodResult">
+        <include refid="selectRtFoodVo"/>
+        where del_flag='0' and id = #{id}
+    </select>
+
+    <insert id="insertRtFood" parameterType="com.example.restaurant.domain.RtFood" useGeneratedKeys="true" keyProperty="id">
+        insert into rt_food
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="price != null">price,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="url != null">url,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="price != null">#{price},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="url != null">#{url},</if>
+        </trim>
+    </insert>
+
+    <update id="updateRtFood" parameterType="com.example.restaurant.domain.RtFood">
+        update rt_food
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="url != null">url = #{url},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRtFoodById" parameterType="long">
+        update rt_food set del_flag='2' where id = #{id}
+    </delete>
+
+    <delete id="deleteRtFoodByIds" parameterType="long">
+        update rt_food set del_flag='2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

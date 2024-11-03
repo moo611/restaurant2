@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.restaurant.mapper.RtMessageMapper">
+
+    <resultMap type="com.example.restaurant.domain.RtMessage" id="RtMessageResult">
+        <result property="id"    column="id"    />
+        <result property="from"    column="from"    />
+        <result property="to"    column="to"    />
+        <result property="message"    column="message"    />
+        <result property="table"    column="table"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="foodInfo"    column="food_info"    />
+    </resultMap>
+
+    <sql id="selectRtMessageVo">
+        select id, `from`, `to`, message, `table`, order_id, del_flag, create_time, create_by, update_time, update_by from rt_message
+    </sql>
+
+    <select id="selectRtMessageList" parameterType="com.example.restaurant.domain.RtMessage" resultMap="RtMessageResult">
+        select a.id, a.`from`, a.`to`, a.message, a.`table`, a.order_id, a.del_flag, a.create_time, a.create_by, a.update_time, a.update_by,b.food_info from rt_message a
+        left join rt_order b on a.order_id = b.id
+        <where>a.del_flag='0' and b.del_flag='0'
+            <if test="from != null  and from != ''"> and a.`from` = #{from}</if>
+            <if test="to != null  and to != ''"> and a.`to` = #{to}</if>
+            <if test="message != null  and message != ''"> and a.message = #{message}</if>
+            <if test="table != null  and table != ''"> and a.`table` = #{table}</if>
+            <if test="orderId != null "> and a.order_id = #{orderId}</if>
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="selectRtMessageById" parameterType="long" resultMap="RtMessageResult">
+        <include refid="selectRtMessageVo"/>
+        where del_flag='0' and id = #{id}
+    </select>
+
+    <insert id="insertRtMessage" parameterType="com.example.restaurant.domain.RtMessage" useGeneratedKeys="true" keyProperty="id">
+        insert into rt_message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="from != null">`from`,</if>
+            <if test="to != null">`to`,</if>
+            <if test="message != null">message,</if>
+            <if test="table != null">`table`,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="from != null">#{from},</if>
+            <if test="to != null">#{to},</if>
+            <if test="message != null">#{message},</if>
+            <if test="table != null">#{table},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateRtMessage" parameterType="com.example.restaurant.domain.RtMessage">
+        update rt_message
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="from != null">`from` = #{from},</if>
+            <if test="to != null">`to` = #{to},</if>
+            <if test="message != null">message = #{message},</if>
+            <if test="table != null">`table` = #{table},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRtMessageById" parameterType="long">
+        update rt_message set del_flag='2' where id = #{id}
+    </delete>
+
+    <delete id="deleteRtMessageByIds" parameterType="long">
+        update rt_message set del_flag='2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
